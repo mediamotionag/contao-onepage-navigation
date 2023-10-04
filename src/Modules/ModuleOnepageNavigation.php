@@ -17,6 +17,8 @@ use Contao\System;
 use Contao\PageModel;
 use Contao\ArticleModel;
 use Contao\StringUtil;
+use Contao\Config;
+use Contao\Input;
 
 class ModuleOnepageNavigation extends Module
 {
@@ -64,17 +66,25 @@ class ModuleOnepageNavigation extends Module
         // get current page id
         $intPageID = $GLOBALS['objPage']->id;
 
+        $params = '';
+
+        // Set the item from the auto_item parameter
+        if (!isset($_GET['items']) && isset($_GET['auto_item']) && Config::get('useAutoItem'))
+        {
+            $params = '/' . Input::get('auto_item');
+        }
+
         // override page ID if a rootPage is defined
         if ($this->defineRoot)
         {
             $PageID    = PageModel::findById($this->rootPage);
-            $PageAlias = $PageID->getFrontendUrl('');
+            $PageAlias = $PageID->getFrontendUrl($params);
             $intPageID = $PageID->id;
         }
         else
         {
             $PageID    = PageModel::findById($intPageID);
-            $PageAlias = $PageID->getFrontendUrl('');
+            $PageAlias = $PageID->getFrontendUrl($params);
         }
 
         // get articles by page id
